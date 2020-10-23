@@ -7,8 +7,8 @@
     <script src="biblio.js"></script>
 
 </head>
+
 <body bgcolor="#afffff">
-<form id="form">
     <div id="main">
         <div id="identification">
             <input type="text" placeholder="Nom" value="Grosso">
@@ -33,20 +33,14 @@
 
                 </tbody>
             </table>
-            <input type="submit" value="Ajouter produit" id="addRow">
-
-            <label>prix:      	</label>
-            <label>quantite:	</label>
-            <label>montant:		<input type="text" name="mt" 	id="mt" 	size="8"    readonly></label>
+            <input type="submit" value="Ajouter produit" id="addRow" onclick="expand()">
 
         </div>
 
         <div id="montant">
-
+            <input type="text" name="qt" id="mt" placeholder="Montant" size="5"    readonly>
         </div>
     </div>
-
-</form>
 </body>
 <script>
     //tableau contenant les produits
@@ -57,24 +51,38 @@
     ];
 
     //fonction permettant de pouvoir ajouter plusieurs produits dans une commande
+
+    //Déclaration des tableaux qui contiendront les ids des différents id
+    let tabIdListe = [];
+    let tabIdAdd = [];
+    let tabIdSub = [];
+    let tabIdPrix = [];
+    let tabIdQt = [];
+    let tabIdDisp = [];
+    let n = 1;
+
+
     function commande(){
-        let n = 1;
+
+
         let idListe = "liste" + n;
         let idAdd = "add" + n;
         let idSub = "sub" + n;
         let idPrix = "prix" + n;
         let idQt = 'qt' + n;
+        let idDisp = 'disp' + n;
+
+
+
+        tabIdAdd.push(idAdd);
+        tabIdQt.push(idQt);
+        tabIdSub.push(idSub);
+        tabIdListe.push(idListe);
+        tabIdPrix.push(idPrix);
+        tabIdDisp.push(idDisp);
+
         //si on appuie sur ajouter un produit ou, si le tableau contenant la commande est vide on ajoute une ligne de choix de produit
-        if ($('addRow').click() || $('tbod1').children.length == 0){
-            if ($('addRow').click()){
-                //création dinamique d'id afin de pouvoir initialiser dynamiquement le select, et les différents champs
-                n+=1;
-                idListe = "liste" + n;
-                idAdd = "liste" + n;
-                idSub = "sub" + n;
-                idPrix = "prix" + n;
-                idQt = 'qt' + n;
-            }
+        if ($('tbod1').children.length == 0){
 
             row = '<tr>' +
                 '<td><select name="liste" id='+ idListe + ' >' +
@@ -87,8 +95,38 @@
                 '</td>'
             '</tr>'
             $('tbod1').innerHTML += row;
-            //init(idListe, idAdd, idSub, idQt);
+            init(idListe, idAdd, idSub, idQt, idPrix, idDisp);
         }
+    }
+
+    function expand() {
+            //création dinamique d'id afin de pouvoir initialiser dynamiquement le select, et les différents champs
+            n+=1;
+            idListe = "liste" + n;
+            idAdd = "add" + n;
+            idSub = "sub" + n;
+            idPrix = "prix" + n;
+            idQt = 'qt' + n;
+            idDisp = 'disp' + n;
+
+            tabIdAdd.push(idAdd);
+            tabIdQt.push(idQt);
+            tabIdSub.push(idSub);
+            tabIdListe.push(idListe);
+            tabIdPrix.push(idPrix);
+            tabIdDisp.push(idDisp);
+
+            $('tbod1').innerHTML += '<tr>' +
+                '<td><select name="liste" id='+ idListe + ' >' +
+                '            </select></td>' +
+                '<td> <input type="text" name="prix" \tid='+ idPrix + ' placeholder="Prix"\tsize="6"    readonly></td>' +
+                '<td> <input type="text" name="qt" \tid='+ idQt + ' placeholder="Quantité"\tsize="5"    readonly></td>' +
+                '<td>' +
+                '<input type="button" id = '+ idAdd + ' value = "+" >' +
+                '<input type="button" id =' + idSub + ' value = "-" >' +
+                '</td>' +
+            '</tr>';
+        init(idListe, idAdd, idSub, idQt, idPrix, idDisp);
     }
 
 //////////////////////////////////
@@ -111,42 +149,48 @@
 
     /* fonction permettant d'afficher le produit n à l'ecran */
 
-    function display(n){
-        console.log(tabProduits[n].reference);
-        $("prix").value	=	tabProduits[n].prix;
-        $("qt").value   =	"";
+    function display(n, idPrix, idQt){
+        $(idPrix).value	=	tabProduits[n].prix;
+        $(idQt).value   =	"";
         $("mt").value	=	"";
     }
 
     /* fonction permettant de recalculer le montant */
 
-    function calculate(idPrix, idQt){
-        $("mt").value=$(idPrix).value*$(idQt).value;
+    function calculate(){
+        let total = 0;
+        for (let i = 0; i<$('tbod1').children.length;i++ ){
+             total += $(tabIdQt[i]).value*$(tabIdPrix[i]).value;
+        }
+        $("mt").value=total;
     }
 
     /* affichage du contenu du select */
 
-    function init(idListe, idAdd, idSub, idQt){
-        var ch ='<option selected id="disparait" value="">Sélectionnez vos produits </option>';   // chaine contenant les options du select
+    function init(idListe, idAdd, idSub, idQt, idPrix, idDisp){
+        console.log(idDisp);
+        var ch ='<option selected id=' + idDisp + '>Sélectionnez vos produits </option>';   // chaine contenant les options du select
         for (var i= 0;i<tabProduits.length;i++){
             ch+= `<option>${tabProduits[i].reference}</option>`;
         }
         $(idListe).innerHTML = ch;                            // affichage des options de la liste déroulante
         // ATTENTION ne jamais modifier la propiété innerHTML avec une information saisie par l'internaute
-        listeners(idListe, idAdd, idSub, idQt);
+        listeners();
     }
 
-    /* mise en place des écouteurs */
-    function listeners(idListe, idAdd, idSub, idQt){
-        $(idListe).onclick  = document.getElementById('disparait').style.display = 'none';
-        $(idListe).onchange  = function(){display(this.selectedIndex-1);}
-        $(idAdd).onclick     = function(){if ($(idListe).value!='')
-        {$(idQt).value++;calculate();}}
-        $(idSub).onclick     = function(){if (this.form.idQt.value>0)
-        {$(idQt).value--;calculate();}}
+    /* mise en place des écouteurs utilisation des tableaux stockants les id afin de pouvoir utiliser un nombre illimité de produits*/
+    function listeners(){
+        for (let i = 0; i<$('tbod1').children.length;i++ ){
+        $(tabIdListe[i]).onclick  = $(tabIdDisp[i]).style.display = 'none';
+        $(tabIdListe[i]).onchange  = function(){display(this.selectedIndex-1, tabIdPrix[i], tabIdQt[i]);}
+        $(tabIdAdd[i]).onclick     = function(){if ($(tabIdListe[i]).value!='')
+        {$(tabIdQt[i]).value++;calculate(tabIdPrix[i],tabIdQt[i]);}}
+        $(tabIdSub[i]).onclick     = function(){if ($(tabIdQt[i]).value>0)
+        {$(tabIdQt[i]).value--;calculate(tabIdPrix[i],tabIdQt[i]);}}
+        }
     }
 
 
-    //onload=commande();
+    onload=commande();
 </script>
 </html >
