@@ -1,10 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>TpNoté JS</title>
+    <link type="text/css" rel="stylesheet" href="style.css">
+    <script src="biblio.js"></script>
+
 </head>
-<body>
-$END$
+<body bgcolor="#afffff">
+<form id="form">
+    <div id="main">
+        <div id="identification">
+            <input type="text" placeholder="Nom" value="Grosso">
+            <input type="text" placeholder="Prénom" value="Roland"><br>
+            <input type="text" placeholder="Adresse" value="2 Rue Bayard" size="46px"><br>
+            <input type="text" placeholder="CP" value="05000">
+            <input type="text" placeholder="ville" value="Gap"><br>
+            <input type="text" placeholder="Téléphone" value="0783313081">
+            <input type="text" placeholder="Email" value="jksqkas@gmail.com">
+        </div>
+
+        <div id="produits">
+            <table>
+                <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Prix</th>
+                    <th>Quantité</th>
+                </tr>
+                </thead>
+                <tbody id="tbod1">
+
+                </tbody>
+            </table>
+            <input type="submit" value="Ajouter produit" id="addRow">
+
+            <label>prix:      	</label>
+            <label>quantite:	</label>
+            <label>montant:		<input type="text" name="mt" 	id="mt" 	size="8"    readonly></label>
+
+        </div>
+
+        <div id="montant">
+
+        </div>
+    </div>
+
+</form>
 </body>
-</html>
+<script>
+    //tableau contenant les produits
+    var tabProduits = [
+        {'reference': 'pc', 'prix':1000},
+        {'reference':'imprimante', 'prix':80},
+        {'reference':'repeteur', 'prix':30}
+    ];
+
+    //fonction permettant de pouvoir ajouter plusieurs produits dans une commande
+    function commande(){
+        let n = 1;
+        let idListe = "liste" + n;
+        let idAdd = "add" + n;
+        let idSub = "sub" + n;
+        let idPrix = "prix" + n;
+        let idQt = 'qt' + n;
+        //si on appuie sur ajouter un produit ou, si le tableau contenant la commande est vide on ajoute une ligne de choix de produit
+        if ($('addRow').click() || $('tbod1').children.length == 0){
+            if ($('addRow').click()){
+                //création dinamique d'id afin de pouvoir initialiser dynamiquement le select, et les différents champs
+                n+=1;
+                idListe = "liste" + n;
+                idAdd = "liste" + n;
+                idSub = "sub" + n;
+                idPrix = "prix" + n;
+                idQt = 'qt' + n;
+            }
+
+            row = '<tr>' +
+                '<td><select name="liste" id='+ idListe + ' >' +
+                '            </select></td>' +
+                '<td> <input type="text" name="prix" \tid='+ idPrix + ' placeholder="Prix"\tsize="6"    readonly></td>' +
+                '<td> <input type="text" name="qt" \tid='+ idQt + ' placeholder="Quantité"\tsize="5"    readonly></td>' +
+                '<td>' +
+                '<input type="button" id = '+ idAdd + ' value = "+" >' +
+                '<input type="button" id =' + idSub + ' value = "-" >' +
+                '</td>'
+            '</tr>'
+            $('tbod1').innerHTML += row;
+            //init(idListe, idAdd, idSub, idQt);
+        }
+    }
+
+//////////////////////////////////
+    function verifForm(idForm) {
+        let form = document.getElementById(idForm).children;
+        for (let i = 0; i < form.length; i++) {
+            if (form[i].type == 'text' || form[i].type == 'email') {
+                if (form[i].validity.valid == false) {
+                    alert('Une ou plusieurs valeurs sont fausses');
+                }
+            }
+        }
+    }
+
+    //fonction de remise à zéro
+    function raz(id){
+        document.getElementById(id).value = null;
+    }
+
+
+    /* fonction permettant d'afficher le produit n à l'ecran */
+
+    function display(n){
+        console.log(tabProduits[n].reference);
+        $("prix").value	=	tabProduits[n].prix;
+        $("qt").value   =	"";
+        $("mt").value	=	"";
+    }
+
+    /* fonction permettant de recalculer le montant */
+
+    function calculate(idPrix, idQt){
+        $("mt").value=$(idPrix).value*$(idQt).value;
+    }
+
+    /* affichage du contenu du select */
+
+    function init(idListe, idAdd, idSub, idQt){
+        var ch ='<option selected id="disparait" value="">Sélectionnez vos produits </option>';   // chaine contenant les options du select
+        for (var i= 0;i<tabProduits.length;i++){
+            ch+= `<option>${tabProduits[i].reference}</option>`;
+        }
+        $(idListe).innerHTML = ch;                            // affichage des options de la liste déroulante
+        // ATTENTION ne jamais modifier la propiété innerHTML avec une information saisie par l'internaute
+        listeners(idListe, idAdd, idSub, idQt);
+    }
+
+    /* mise en place des écouteurs */
+    function listeners(idListe, idAdd, idSub, idQt){
+        $(idListe).onclick  = document.getElementById('disparait').style.display = 'none';
+        $(idListe).onchange  = function(){display(this.selectedIndex-1);}
+        $(idAdd).onclick     = function(){if ($(idListe).value!='')
+        {$(idQt).value++;calculate();}}
+        $(idSub).onclick     = function(){if (this.form.idQt.value>0)
+        {$(idQt).value--;calculate();}}
+    }
+
+
+    //onload=commande();
+</script>
+</html >
