@@ -2,7 +2,9 @@
     display: none;
 }
 
-valid{
-    border-radius: 2px;
-    border: red;
+input:invalid {
+    border-color: red;
+}
+input:valid {
+    border-color: #ccc;
 }

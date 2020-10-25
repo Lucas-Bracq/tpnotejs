@@ -15,10 +15,10 @@
         <input type="text" id="nom" placeholder="Nom" value="Grosso" required >
         <input type="text" id="prenom" placeholder="Prénom" value="Roland" required ><br>
         <input type="text" id="adresse" placeholder="Adresse" value="2 Rue Bayard" size="46px" required ><br>
-        <input type="text" id="cp" placeholder="CP" value="05000" required>
+        <input type="text" id="cp" placeholder="CP" value="05000" required pattern="[0-9]{5}">
         <input type="text" id="ville" placeholder="ville" value="Gap" required><br>
-        <input type="text" id="num" placeholder="Téléphone" value="0783313081" required>
-        <input type="email" id="email" placeholder="Email" value="jksqkas@gmail.com" pattern="[a-z0-9._%+-]+\.[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required>
+        <input type="text" id="num" placeholder="Téléphone" value="0783313081" pattern="^(?:0|\(?\+33\)?\s?|0033\s?)[1-79](?:[\.\-\s]?\d\d){4}$" required>
+        <input type="email" id="email" placeholder="Email" value="jksqkas.com@gmail.com" pattern="[a-z0-9._%+-]+\.{1}[a-z0-9._%+-]+@[a-z0-9.-]+\.{1}[a-z]{2,4}$" required>
     </div>
 
     <div id="produits">
@@ -34,12 +34,14 @@
 
             </tbody>
         </table>
-        <input type="submit" value="Ajouter produit" id="addRow" onclick="expand()">
+        <input type="button" value="Ajouter produit" id="addRow" onclick="expand()">
 
     </div>
 
     <div id="montant">
-        <input type="text" name="qt" id="mt" placeholder="Montant" size="5"    readonly>
+        <label> Montant HT : <input type="text" name="qt" id="mt" placeholder="Montant" size="5"    readonly></label><br>
+        <label> Montant TVA : <input type="text" name="qt" id="mtTVA" placeholder="Montant" size="5"    readonly></label><br>
+        <label> Total : <input type="text" name="qt" id="mtTTC" placeholder="Montant" size="5"    readonly></label>
     </div>
     <input type="submit" value="Valider commande" onclick="verifForm('form')">
 </div>
@@ -53,8 +55,6 @@
         {'reference':'repeteur', 'prix':30}
     ];
 
-    //fonction permettant de pouvoir ajouter plusieurs produits dans une commande
-
     //Déclaration des tableaux qui contiendront les ids des différents id
     let tabIdListe = [];
     let tabIdAdd = [];
@@ -65,20 +65,28 @@
     let tabIdDel = [];
     let n = 1;
 
-
-    function commande(){
-
-
-        let idListe = "liste" + n;
-        let idAdd = "add" + n;
-        let idSub = "sub" + n;
-        let idDel = "del" + n;
-        let idPrix = "prix" + n;
-        let idQt = 'qt' + n;
-        let idDisp = 'disp' + n;
+    let idListe;
+    let idAdd;
+    let idSub;
+    let idDel;
+    let idPrix;
+    let idQt;
+    let idDisp;
 
 
+    //initialise l'id suivante
+    function nextId(){
+        idListe = "liste" + n;
+        idAdd = "add" + n;
+        idSub = "sub" + n;
+        idDel = "del" + n;
+        idPrix = "prix" + n;
+        idQt = 'qt' + n;
+        idDisp = 'disp' + n;
+    }
 
+    //on push les ids dans des tableaux
+    function pushid() {
         tabIdAdd.push(idAdd);
         tabIdQt.push(idQt);
         tabIdSub.push(idSub);
@@ -86,6 +94,12 @@
         tabIdPrix.push(idPrix);
         tabIdDisp.push(idDisp);
         tabIdDel.push(idDel);
+    }
+
+    function commande(){
+
+        nextId();
+        pushid()
 
         //si on appuie sur ajouter un produit ou, si le tableau contenant la commande est vide on ajoute une ligne de choix de produit
         if ($('tbod1').children.length == 0){
@@ -93,7 +107,7 @@
             row = '<tr>' +
                 '<td><select name="liste" id='+ idListe + ' >' +
                 '            </select></td>' +
-                '<td> <input type="text" name="prix" \tid='+ idPrix + ' placeholder="Prix"\tsize="6"    readonly> required</td>' +
+                '<td> <input type="text" name="prix" \tid='+ idPrix + ' placeholder="Prix"\tsize="6"    readonly required></td>' +
                 '<td> <input type="text" name="qt" \tid='+ idQt + ' placeholder="Quantité"\tsize="5"    readonly required></td>' +
                 '<td>' +
                 '<input type="button" id = '+ idAdd + ' value = "+" >' +
@@ -109,16 +123,16 @@
     function expand() {
         //création dynamique d'id afin de pouvoir initialiser dynamiquement le select, et les différents champs
         n+=1;
-        idListe = "liste" + n;idAdd = "add" + n;idSub = "sub" + n;idPrix = "prix" + n;idQt = 'qt' + n;idDisp = 'disp' + n;idDel = 'del' + n;
+        nextId()
 
         //Je push les nouveaux ids générés dans leurs tableaux respectifs
-        tabIdAdd.push(idAdd);tabIdQt.push(idQt);tabIdSub.push(idSub);tabIdListe.push(idListe);tabIdPrix.push(idPrix);tabIdDisp.push(idDisp);tabIdDel.push(idDel);
+        pushid();
 
         $('tbod1').innerHTML += '<tr>' +
             '<td><select name="liste" id='+ idListe + ' >' +
             '            </select></td>' +
             '<td> <input type="text" name="prix" \tid='+ idPrix + ' placeholder="Prix"\tsize="6"    readonly required></td>' +
-            '<td> <input type="text" name="qt" \tid='+ idQt + ' placeholder="Quantité"\tsize="5"    readonly> required</td>' +
+            '<td> <input type="text" name="qt" \tid='+ idQt + ' placeholder="Quantité"\tsize="5"    readonly required></td>' +
             '<td>' +
             '<input type="button" id = '+ idAdd + ' value = "+" >' +
             '<input type="button" id =' + idSub + ' value = "-" >' +
@@ -128,10 +142,6 @@
         init(idListe, idAdd, idSub, idQt, idPrix, idDisp, idDel);
     }
 
-
-    function test (){
-        console.log();
-    }
 
     //////////////////////////////////
     function verifForm(idForm) {
@@ -157,16 +167,29 @@
         $(idPrix).value	=	tabProduits[n].prix;
         $(idQt).value   =	"";
         $("mt").value	=	"";
+        $("mtTVA").value     =   "";
+        $("mtTTC").value     =   "";
     }
 
     /* fonction permettant de recalculer le montant */
 
+    function roundDecimal(nombre, precision){
+        var precision = precision || 2;
+        var tmp = Math.pow(10, precision);
+        return Math.round( nombre*tmp )/tmp;
+    }
+    
     function calculate(){
-        let total = 0;
+        let montant = 0;
+        let TVA = 0;
         for (let i = 0; i<$('tbod1').children.length;i++ ){
-            total += $(tabIdQt[i]).value*$(tabIdPrix[i]).value;
+            montant += $(tabIdQt[i]).value*$(tabIdPrix[i]).value;
         }
-        $("mt").value=total;
+        TVA = montant*19.6/100;
+        $("mt").value=roundDecimal(montant, 2);
+        $("mtTVA").value=roundDecimal(TVA, 2);
+        $("mtTTC").value=roundDecimal(montant+TVA, 2);
+
     }
 
     /* affichage du contenu du select */
