@@ -12,13 +12,24 @@
 <form id="form">
 <div id="main">
     <div id="identification">
-        <input type="text" id="nom" placeholder="Nom" value="Grosso" required >
-        <input type="text" id="prenom" placeholder="Prénom" value="Roland" required ><br>
-        <input type="text" id="adresse" placeholder="Adresse" value="2 Rue Bayard" size="46px" required ><br>
-        <input type="text" id="cp" placeholder="CP" value="05000" required pattern="[0-9]{5}">
-        <input type="text" id="ville" placeholder="ville" value="Gap" required><br>
-        <input type="text" id="num" placeholder="Téléphone" value="0783313081" pattern="^(?:0|\(?\+33\)?\s?|0033\s?)[1-79](?:[\.\-\s]?\d\d){4}$" required>
-        <input type="email" id="email" placeholder="Email" value="jksqkas.com@gmail.com" pattern="[a-z0-9._%+-]+\.{1}[a-z0-9._%+-]+@[a-z0-9.-]+\.{1}[a-z]{2,4}$" required>
+
+                    <input class="id" type="text" id="nom" placeholder="Nom" value="Grosso" required >
+
+                    <input class="id" type="text" id="prenom" placeholder="Prénom" value="Roland" required ><br>
+
+                    <input class="id" type="text" id="adresse" placeholder="Adresse" value="2 Rue Bayard" size="46px" required ><br>
+
+                    <input class="id" type="text" id="cp" placeholder="CP" value="05000" required pattern="[0-9]{5}">
+
+                    <input class="id" type="text" id="ville" placeholder="ville" value="Gap" required><br>
+
+                    <input class="id" type="text" id="num" placeholder="Téléphone" value="0783313081" pattern="^(?:0|\(?\+33\)?\s?|0033\s?)[1-79](?:[\.\-\s]?\d\d){4}$" required>
+
+                    <input class="id" type="email" id="email" placeholder="Email" value="jksqkas.com@gmail.com" pattern="[a-z0-9._%+-]+\.{1}[a-z0-9._%+-]+@[a-z0-9.-]+\.{1}[a-z]{2,4}$" required><br>
+
+
+
+
     </div>
 
     <div id="produits">
@@ -34,16 +45,40 @@
 
             </tbody>
         </table>
-        <input type="button" value="Ajouter produit" id="addRow" onclick="expand()">
+        <input type="button" value="Ajouter produit" id="addRow">
 
     </div>
 
     <div id="montant">
-        <label> Montant HT : <input type="text" name="qt" id="mt" placeholder="Montant" size="5"    readonly></label><br>
-        <label> Montant TVA : <input type="text" name="qt" id="mtTVA" placeholder="Montant" size="5"    readonly></label><br>
-        <label> Total : <input type="text" name="qt" id="mtTTC" placeholder="Montant" size="5"    readonly></label>
+        <table>
+            <tbody>
+            <tr>
+                <td> Montant HT :</td>
+                <td>
+                     <input type="text" name="qt" id="mt" placeholder="Montant" size="7"    readonly>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Montant TVA :
+                </td>
+                <td>
+                    <input type="text" name="qt" id="mtTVA" placeholder="Montant" size="7"    readonly>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Total:
+                </td>
+                <td>
+                    <input type="text" name="qt" id="mtTTC" placeholder="Montant" size="7"    readonly>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
     </div>
-    <input type="submit" value="Valider commande" onclick="verifForm('form')">
+    <input type="submit" value="Valider commande" id="verif" onclick="verifForm('form')">
 </div>
 </form>
 </body>
@@ -64,7 +99,7 @@
     let tabIdDisp = [];
     let tabIdDel = [];
     let n = 1;
-
+    //Déclaration des variables ids
     let idListe;
     let idAdd;
     let idSub;
@@ -96,26 +131,28 @@
         tabIdDel.push(idDel);
     }
 
+    function nextRow() {
+        return '<tr>' +
+            '<td><select name="liste" id='+ idListe + ' >' +
+            '            </select></td>' +
+            '<td> <input type="text" name="prix" \tid='+ idPrix + ' placeholder="Prix"\tsize="6"    readonly required></td>' +
+            '<td> <input type="text" name="qt" \tid='+ idQt + ' placeholder="Quantité"\tsize="5"    readonly required></td>' +
+            '<td>' +
+            '<input type="button" id = '+ idAdd + ' value = "+" >' +
+            '<input type="button" id =' + idSub + ' value = "-" >' +
+            '<input type="button" id =' + idDel + ' value = "x" >'+
+            '</td>'
+        '</tr>'
+    }
     function commande(){
 
         nextId();
-        pushid()
-
+        pushid();
+        nextRow();
         //si on appuie sur ajouter un produit ou, si le tableau contenant la commande est vide on ajoute une ligne de choix de produit
         if ($('tbod1').children.length == 0){
 
-            row = '<tr>' +
-                '<td><select name="liste" id='+ idListe + ' >' +
-                '            </select></td>' +
-                '<td> <input type="text" name="prix" \tid='+ idPrix + ' placeholder="Prix"\tsize="6"    readonly required></td>' +
-                '<td> <input type="text" name="qt" \tid='+ idQt + ' placeholder="Quantité"\tsize="5"    readonly required></td>' +
-                '<td>' +
-                '<input type="button" id = '+ idAdd + ' value = "+" >' +
-                '<input type="button" id =' + idSub + ' value = "-" >' +
-                '<input type="button" id =' + idDel + ' value = "x" >'+
-                '</td>'
-            '</tr>'
-            $('tbod1').innerHTML += row;
+            $('tbod1').innerHTML += nextRow();
             init(idListe, idAdd, idSub, idQt, idPrix, idDisp, idDel);
         }
     }
@@ -128,17 +165,7 @@
         //Je push les nouveaux ids générés dans leurs tableaux respectifs
         pushid();
 
-        $('tbod1').innerHTML += '<tr>' +
-            '<td><select name="liste" id='+ idListe + ' >' +
-            '            </select></td>' +
-            '<td> <input type="text" name="prix" \tid='+ idPrix + ' placeholder="Prix"\tsize="6"    readonly required></td>' +
-            '<td> <input type="text" name="qt" \tid='+ idQt + ' placeholder="Quantité"\tsize="5"    readonly required></td>' +
-            '<td>' +
-            '<input type="button" id = '+ idAdd + ' value = "+" >' +
-            '<input type="button" id =' + idSub + ' value = "-" >' +
-            '<input type="button" id =' + idDel + ' value = "x" >' +
-            '</td>' +
-            '</tr>';
+        $('tbod1').innerHTML += nextRow();
         init(idListe, idAdd, idSub, idQt, idPrix, idDisp, idDel);
     }
 
@@ -152,6 +179,9 @@
                     alert('Une ou plusieurs valeurs sont fausses');
                 }
             }
+        }
+        if (!$('mtTTC').value){
+            alert('Veuillez choisir au moins un produit')
         }
     }
 
@@ -197,7 +227,7 @@
     function init(idListe, idAdd, idSub, idQt, idPrix, idDisp){
         var ch ='<option selected value="" id=' + idDisp + ' required >Sélectionnez vos produits </option>';   // chaine contenant les options du select
         for (var i= 0;i<tabProduits.length;i++){
-            ch+= `<option>${tabProduits[i].reference}</option>`;
+            ch+= `<option value=${tabProduits[i].reference}>${tabProduits[i].reference}</option>`;
         }
         $(idListe).innerHTML = ch;                            // affichage des options de la liste déroulante
         // ATTENTION ne jamais modifier la propiété innerHTML avec une information saisie par l'internaute
@@ -208,18 +238,26 @@
     function listeners(){
         for (let i = 0; i<$('tbod1').children.length;i++ ){
             $(tabIdListe[i]).onclick  = $(tabIdDisp[i]).style.display = 'none';
-            $(tabIdListe[i]).onchange  = function(){display(this.selectedIndex-1, tabIdPrix[i], tabIdQt[i]);}
+            $(tabIdListe[i]).onchange  =
+                function(){
+                display(this.selectedIndex-1, tabIdPrix[i], tabIdQt[i]);
+                if (!$(tabIdQt[i]).value){
+                    $(tabIdQt[i]).value = 1;
+                }
+                calculate(tabIdPrix[i],tabIdQt[i]);
+            }
             $(tabIdAdd[i]).onclick     = function(){if ($(tabIdListe[i]).value!='')
             {$(tabIdQt[i]).value++;calculate(tabIdPrix[i],tabIdQt[i]);}}
             $(tabIdSub[i]).onclick     = function(){if ($(tabIdQt[i]).value>0)
             {$(tabIdQt[i]).value--;calculate(tabIdPrix[i],tabIdQt[i]);}}
-            $(tabIdDel[i]).onclick     = function(){if ($(tabIdQt[i]).value>0)
+            $(tabIdDel[i]).onclick     = function(){
                 del(tabIdQt[i]);del(tabIdPrix[i]);del(tabIdListe[i]);
                 $(tabIdDisp[i]).style.display = 'block';
                 $(tabIdListe[i]).selectedIndex = 0;
                 $(tabIdListe[i]).onclick  = $(tabIdDisp[i]).style.display = 'none';
-
+                calculate(tabIdPrix[i],tabIdQt[i]);
             }
+            $('addRow').onclick = function() {expand();del('mt');del('mtTVA');del('mtTTC');}
         }
     }
 
